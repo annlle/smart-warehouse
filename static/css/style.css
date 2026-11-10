@@ -1,0 +1,44 @@
+body {
+    background-color: #f5f6fa;
+    color: #252a34;
+    font-family: Arial, sans-serif;
+}
+
+.navbar-brand {
+    letter-spacing: 0.3px;
+}
+
+.dashboard-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.dashboard-card .card-body {
+    padding: 22px;
+}
+
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #555d6b;
+}
+
+.table td {
+    font-size: 0.9rem;
+}
+
+.btn {
+    border-radius: 7px;
+}
+
+.form-control::placeholder,
+.form-control::-webkit-input-placeholder {
+    color: #adb5bd !important;
+    opacity: 1 !important;
+}

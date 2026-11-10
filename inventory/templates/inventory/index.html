@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+
+{% block title %}Облік товарів | SmartWarehouse{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="fw-bold mb-1">Облік товарів</h2>
+        <p class="text-muted mb-0">
+            Управління товарними запасами складу
+        </p>
+    </div>
+
+    <a href="{% url 'inventory:add' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-2"></i>
+        Додати палету
+    </a>
+
+</div>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <p class="text-muted mb-2">Усього палет</p>
+                <h3 class="fw-bold mb-0">{{ total_items }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <p class="text-muted mb-2">На складі</p>
+                <h3 class="fw-bold text-success mb-0">{{ in_stock }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <p class="text-muted mb-2">Переміщуються</p>
+                <h3 class="fw-bold text-primary mb-0">{{ moving }}</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-semibold">Список палет</h5>
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle mb-0">
+
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Назва товару</th>
+                    <th>Вага (кг)</th>
+                    <th>Кількість</th>
+                    <th>Локація</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for item in items %}
+
+                    {% if item.status == 'WRITTEN_OFF' %}
+                        <tr class="text-muted">
+                    {% else %}
+                        <tr>
+                    {% endif %}
+
+                        <td class="fw-semibold">
+                            {% if item.status == 'WRITTEN_OFF' %}
+                                <span class="text-decoration-line-through">
+                                    {{ item.item_id }}
+                                </span>
+                            {% else %}
+                                {{ item.item_id }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.status == 'WRITTEN_OFF' %}
+                                <span class="text-decoration-line-through">
+                                    {{ item.name }}
+                                </span>
+                            {% else %}
+                                {{ item.name }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.status == 'WRITTEN_OFF' %}
+                                <span class="text-decoration-line-through">
+                                    {{ item.weight_kg }}
+                                </span>
+                            {% else %}
+                                {{ item.weight_kg }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.status == 'WRITTEN_OFF' %}
+                                <span class="text-decoration-line-through">
+                                    {{ item.quantity }}
+                                </span>
+                            {% else %}
+                                {{ item.quantity }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.status == 'WRITTEN_OFF' %}
+                                <span class="text-decoration-line-through">
+                                    {{ item.zone }} ({{ item.x }}, {{ item.y }})
+                                </span>
+                            {% else %}
+                                {{ item.zone }} ({{ item.x }}, {{ item.y }})
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="dropdown">
+
+                                {% if item.status == 'IN_STOCK' %}
+                                    <button class="badge text-bg-success border-0"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        На складі
+                                        <i class="bi bi-chevron-down ms-1"></i>
+                                    </button>
+
+                                {% elif item.status == 'RESERVED' %}
+                                    <button class="badge text-bg-warning border-0"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        Зарезервовано
+                                        <i class="bi bi-chevron-down ms-1"></i>
+                                    </button>
+
+                                {% elif item.status == 'MOVING' %}
+                                    <button class="badge text-bg-primary border-0"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        Переміщується
+                                        <i class="bi bi-chevron-down ms-1"></i>
+                                    </button>
+
+                                {% elif item.status == 'SHIPPED' %}
+                                    <span class="badge text-bg-secondary">
+                                        Відвантажено
+                                    </span>
+
+                                {% elif item.status == 'WRITTEN_OFF' %}
+                                    <span class="badge text-bg-dark">
+                                        Списано
+                                    </span>
+                                {% endif %}
+
+                                {% if item.status == 'IN_STOCK' or item.status == 'RESERVED' or item.status == 'MOVING' %}
+
+                                    <ul class="dropdown-menu">
+
+                                        {% if item.status == 'IN_STOCK' %}
+                                            <li>
+                                                <form method="POST"
+                                                      action="{% url 'inventory:change_status' item.item_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status" value="RESERVED">
+
+                                                    <button type="submit" class="dropdown-item">
+                                                        <span class="badge text-bg-warning me-2">&nbsp;</span>
+                                                        Зарезервовано
+                                                    </button>
+                                                </form>
+                                            </li>
+
+                                        {% elif item.status == 'RESERVED' %}
+                                            <li>
+                                                <form method="POST"
+                                                      action="{% url 'inventory:change_status' item.item_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status" value="IN_STOCK">
+
+                                                    <button type="submit" class="dropdown-item">
+                                                        <span class="badge text-bg-success me-2">&nbsp;</span>
+                                                        На складі
+                                                    </button>
+                                                </form>
+                                            </li>
+
+                                            <li>
+                                                <form method="POST"
+                                                      action="{% url 'inventory:change_status' item.item_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status" value="MOVING">
+
+                                                    <button type="submit" class="dropdown-item">
+                                                        <span class="badge text-bg-primary me-2">&nbsp;</span>
+                                                        Переміщується
+                                                    </button>
+                                                </form>
+                                            </li>
+
+                                        {% elif item.status == 'MOVING' %}
+                                            <li>
+                                                <form method="POST"
+                                                      action="{% url 'inventory:change_status' item.item_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status" value="IN_STOCK">
+
+                                                    <button type="submit" class="dropdown-item">
+                                                        <span class="badge text-bg-success me-2">&nbsp;</span>
+                                                        На складі
+                                                    </button>
+                                                </form>
+                                            </li>
+
+                                            <li>
+                                                <form method="POST"
+                                                      action="{% url 'inventory:change_status' item.item_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status" value="SHIPPED">
+
+                                                    <button type="submit" class="dropdown-item">
+                                                        <span class="badge text-bg-secondary me-2">&nbsp;</span>
+                                                        Відвантажено
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        {% endif %}
+
+                                    </ul>
+
+                                {% endif %}
+
+                            </div>
+                        </td>
+
+                        <td>
+                            {% if item.status == 'IN_STOCK' or item.status == 'WRITTEN_OFF' %}
+
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                            title="Дії">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+
+                                        {% if item.status == 'IN_STOCK' %}
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   href="{% url 'inventory:edit' item.item_id %}">
+                                                    <i class="bi bi-pencil me-2"></i>
+                                                    Редагувати
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   href="{% url 'inventory:write_off' item.item_id %}">
+                                                    <i class="bi bi-archive me-2"></i>
+                                                    Списати
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                        {% endif %}
+
+                                        <li>
+                                            <a class="dropdown-item text-danger"
+                                               href="{% url 'inventory:delete' item.item_id %}">
+                                                <i class="bi bi-trash me-2"></i>
+                                                Видалити
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+
+                            {% endif %}
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            Палети поки відсутні
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+{% endblock %}

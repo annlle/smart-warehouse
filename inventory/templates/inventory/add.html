@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Додавання палети | SmartWarehouse{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <h2 class="fw-bold mb-1">Додавання палети</h2>
+    <p class="text-muted">Заповніть інформацію про нову палету</p>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+
+        {% if errors %}
+            <div class="alert alert-danger">
+                {% for error in errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">ID палети</label>
+                <div class="input-group">
+                    <span class="input-group-text">PALLET-</span>
+                    <input type="text"
+                        name="item_number"
+                        class="form-control"
+                        placeholder="001"
+                        pattern="[0-9]{3}"
+                        maxlength="3"
+                        inputmode="numeric"
+                        required>
+                </div>
+            </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Назва товару</label>
+                    <input type="text" name="name"
+                           class="form-control"
+                           placeholder="Назва товару" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Категорія</label>
+                    <input type="text" name="category"
+                           class="form-control"
+                           placeholder="Категорія товару" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Вага (кг)</label>
+                    <input type="number" name="weight_kg"
+                           class="form-control"
+                           placeholder="0" min="0"
+                           step="0.01" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Кількість коробок</label>
+                    <input type="number" name="quantity"
+                           class="form-control"
+                           placeholder="0" min="0"
+                           step="1" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Зона складу</label>
+                    <select name="zone" class="form-select" required>
+                        <option value="" selected disabled>Оберіть зону</option>
+                        <option value="A">Зона A</option>
+                        <option value="B">Зона B</option>
+                        <option value="C">Зона C</option>
+                        <option value="D">Зона D</option>
+                        <option value="E">Зона E</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Координата X</label>
+                    <input type="number" name="x"
+                           class="form-control"
+                           placeholder="0" min="0"
+                           step="1" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Координата Y</label>
+                    <input type="number" name="y"
+                           class="form-control"
+                           placeholder="0" min="0"
+                           step="1" required>
+                </div>
+
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>
+                    Додати палету
+                </button>
+
+                <a href="{% url 'inventory:index' %}"
+                   class="btn btn-outline-secondary">
+                    Скасувати
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
